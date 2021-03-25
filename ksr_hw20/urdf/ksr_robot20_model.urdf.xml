@@ -1,0 +1,32 @@
+<robot name="ksr20">
+    <link name="chassis" />
+    <link name="wheelFR" />
+    <link name="wheelFL" />
+    <link name="wheelBR" />
+    <link name="wheelBL" />
+
+    <joint name="driveWheelFR" type="continuous">
+        <parent link="chassis">
+        <child link="wheelFR">
+        <origin xyz="0.3 0.3 0.02" rpy="1.5707 0.0 0.0">
+        <axis xyz="0 0 1" />
+    </joint>
+    <joint name="driveWheelFL" type="continuous">
+        <parent link="chassis">
+        <child link="wheelFL">
+        <origin xyz="-0.3 0.3 0.02" rpy="1.5707 0.0 3.14">
+        <axis xyz="0 0 -1" />
+    </joint>
+    <joint name="driveWheelBR" type="continuous">
+        <parent link="chassis">
+        <child link="wheelBR">
+        <origin xyz="0.3 -0.3 0.02" rpy="1.5707 0.0 0.0">
+        <axis xyz="0 0 1" />
+    </joint>
+    <joint name="driveWheelBL" type="continuous">
+        <parent link="chassis">
+        <child link="wheelBR">
+        <origin xyz="-0.3 -0.3 0.02" rpy="1.5707 0.0 3.14">
+        <axis xyz="0 0 -1" />
+    </joint>
+</robot>
