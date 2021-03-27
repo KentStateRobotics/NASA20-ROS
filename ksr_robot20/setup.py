@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'driver = ksr_robot20.driver:main',
+            'teleop = ksr_robot20.teleop:main',
         ],
     },
 )
