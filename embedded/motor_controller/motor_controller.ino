@@ -38,7 +38,7 @@ void loop(){
         uint16_t deltaTime = millis() - lastUpdate;
         lastUpdate = millis();
         SMotors.getPulseCounter(reinterpret_cast<uint16_t*>(buffer));
-        PMotors.getPulseCounter(reinterpret_cast<uint16_t*>(&(buffer[2])));
+        PMotors.getPulseCounter(reinterpret_cast<uint16_t*>(&(buffer[4])));
         Serial.write('|');
         Serial.write(buffer, 8);
         Serial.write(deltaTime);

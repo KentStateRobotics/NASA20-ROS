@@ -10,7 +10,7 @@
   <depend>rclpy</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
-  <depend>pyserial</depend>
+  <depend>python3-serial</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
