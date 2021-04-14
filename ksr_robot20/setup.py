@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'driver = ksr_robot20.driver:main',
-            'teleop = ksr_robot20.teleop:main',
+            'teleop_keyboard = ksr_robot20.teleop_keyboard:main',
         ],
     },
 )

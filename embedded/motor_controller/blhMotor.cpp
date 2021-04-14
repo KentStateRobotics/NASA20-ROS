@@ -20,6 +20,11 @@ BLHMotor::BLHMotor(uint8_t motors, uint8_t startPin, uint8_t directionPin, uint8
 }
 
 void BLHMotor::setSpeed(int8_t speed){
+    if(speed == 0){
+        digitalWrite(this->startPin, HIGH);
+    }else{
+        digitalWrite(this->startPin, LOW);
+    }
     digitalWrite(this->directionPin, (speed > 0 == this->direction) ? HIGH : LOW);
     analogWrite(this->speedPin, abs(speed) << 1);
 }
