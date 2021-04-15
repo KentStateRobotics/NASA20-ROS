@@ -18,6 +18,7 @@ class TeleopKeyboardNode(rclpy.node.Node):
         self.create_timer(.3, self.publishControls)
 
     def publishControls(self):
+        pygame.event.pump()
         driveAngle = 0
         drivePower = 0
         if(pygame.key.get_pressed()[pygame.K_d]):
@@ -39,7 +40,6 @@ class TeleopKeyboardNode(rclpy.node.Node):
         msg.left = self.commandVector[0]
         msg.right = self.commandVector[1]
         self.cmdPub.publish(msg)
-        pygame.event.pump()
         
     def normalize(self, v):
         length = npla.norm(v, 2)
@@ -55,11 +55,17 @@ class TeleopKeyboardNode(rclpy.node.Node):
 
 def main(args=None):
     print("Initalizeing...")
-    pygame.init()
-    print("Initalization complete")
+    pygame.display.init()
+    pygame.joystick.init()
+    pygame.fastevent.init()
+    screen = pygame.display.set_mode((640, 480))
     rclpy.init(args=args)
+    print("Initalization complete")
     driver = TeleopKeyboardNode()
-    rclpy.spin(driver)
+    try:
+        rclpy.spin(driver)
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == '__main__':
     main(sys.argv)
