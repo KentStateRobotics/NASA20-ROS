@@ -1,7 +1,7 @@
 import rclpy
 import rclpy.node
 import ksr_msg.msg
-import sys, select, termios, tty
+import pygame
 import numpy as np
 import numpy.linalg as npla
 import math
@@ -15,28 +15,23 @@ class TeleopKeyboardNode(rclpy.node.Node):
         rotAngle = math.sin(math.pi / 4)
         self.rotateMatrix = np.array([[rotAngle, rotAngle],[-1 * rotAngle, rotAngle]])
         self.commandVector = np.array((0,0), dtype=np.float)
-        self.newSettings = termios.tcgetattr(sys.stdin.fileno())
-        self.newSettings[3] = self.newSettings[3] & ~(termios.ECHO | termios.ICANON)
-        self.newSettings[6][termios.VMIN] = 0
-        self.newSettings[6][termios.VTIME] = 1
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.newSettings)
         self.create_timer(.3, self.publishControls)
 
     def publishControls(self):
         driveAngle = 0
         drivePower = 0
-        for i in range(3):
-            key = sys.stdin.read(1)
-            if(key == ''): break
-            if(key == 'd'):
-                driveAngle = .5
-            elif(key == 'a'):
-                driveAngle = -.5
-            if(key == 'w'):
-                drivePower = .5
-            elif(key == 's'):
-                drivePower = -.5
-        termios.tcflush(sys.stdin, termios.TCIFLUSH)
+        if(pygame.key.get_pressed()[pygame.K_d]):
+            driveAngle = .5
+        elif(pygame.key.get_pressed()[pygame.K_a]):
+            driveAngle = -.5
+        else:
+            driveAngle = 0
+        if(pygame.key.get_pressed()[pygame.K_w]):
+            drivePower = .5
+        elif(pygame.key.get_pressed()[pygame.K_s]):
+            drivePower = -.5
+        else:
+            drivePower = 0
         vec = self.normalize(np.array((driveAngle, drivePower), dtype=np.float))
         vec = np.matmul(self.rotateMatrix, vec)
         self.commandVector = self.squarelize(vec)
@@ -44,6 +39,7 @@ class TeleopKeyboardNode(rclpy.node.Node):
         msg.left = self.commandVector[0]
         msg.right = self.commandVector[1]
         self.cmdPub.publish(msg)
+        pygame.event.pump()
         
     def normalize(self, v):
         length = npla.norm(v, 2)
@@ -58,13 +54,12 @@ class TeleopKeyboardNode(rclpy.node.Node):
         return v / length
 
 def main(args=None):
-    oldSettins = termios.tcgetattr(sys.stdin)
+    print("Initalizeing...")
+    pygame.init()
+    print("Initalization complete")
     rclpy.init(args=args)
     driver = TeleopKeyboardNode()
-    try:
-        rclpy.spin(driver)
-    except (KeyboardInterrupt, Exception):
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, oldSettins)
+    rclpy.spin(driver)
 
 if __name__ == '__main__':
     main(sys.argv)
