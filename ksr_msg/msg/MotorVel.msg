@@ -1,2 +1,2 @@
-float32 rightVel
-float32 leftVel
+float32 right
+float32 left

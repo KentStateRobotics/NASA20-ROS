@@ -1,16 +1,17 @@
-from serial.serialutil import SerialException, to_bytes
 import rclpy
+import rclpy.node
 import sys
 import struct
 import ksr_msg.msg
 import tf2_ros
 import serial
+from serial.serialutil import SerialException, to_bytes
 import serial.tools.list_ports
 import threading
 
 START_CHAR = '|'
 
-class DriverNode(rclpy.Node):
+class DriverNode(rclpy.node.Node):
     '''
     cmdMsg format: bbbb (right side motors, left side motors, elbow, wrist)
     feedbackMsg format: HHHHH (front right, back right, front left, back left, milliseconds)
@@ -19,7 +20,6 @@ class DriverNode(rclpy.Node):
         super().__init__('driver')
         self.velSub = self.create_subscription(ksr_msg.msg.MotorVel, 'vel_cmd', onVelCmd, 10)
         self.velPub = self.create_publisher(ksr_msg.msg.MotorVel, 'vel', 10)
-        self.connect()
         self.cmdStruct = struct.Struct("cbbbb")
         self.feedbackStruct = struct.Struct("HHHHH")
         self.leftVelCmd = 0
@@ -29,6 +29,7 @@ class DriverNode(rclpy.Node):
         self.elbowVelCmd = 0
         self.wristVelCmd = 0
         self.serialConn = None
+        self.connect()
         self.feedbackThread = threading.Thread(target=self.recvFeedback, daemon=True)
         self.feedbackThread.start()
 
@@ -41,8 +42,8 @@ class DriverNode(rclpy.Node):
                     self.get_logger().warn('Failed to connect to serial device')
 
     def onVelCmd(self, msg):
-        self.leftVelCmd = min(max(-1, msg.leftVel), 1) * 127
-        self.rightVelCmd = min(max(-1, msg.rightVel), 1) * 127
+        self.leftVelCmd = min(max(-1, msg.left), 1) * 127
+        self.rightVelCmd = min(max(-1, msg.right), 1) * 127
         try:
             self.serialConn.write(self.cmdStruct.pack(START_CHAR, self.rightVelCmd, self.leftVelCmd, self.elbowVelCmd, self.wristVelCmd))
         except SerialException as e:
@@ -62,8 +63,8 @@ class DriverNode(rclpy.Node):
                     #TODO Check for large variation on either side
 
                     msg = ksr_msg.msg.MotorVel()
-                    msg.leftVel = self.leftSpeed
-                    msg.rightVel = self.rightSpeed
+                    msg.left = self.leftSpeed
+                    msg.right = self.rightSpeed
                     self.velPub.publish(msg)
             except SerialException as e:
                 self.get_logger().warn('Failed to read from serial device')
