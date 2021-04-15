@@ -24,6 +24,7 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Test.msg"
   "msg/MotorVel.msg"
+  "msg/ArmVel.msg"
  )
 
 if(BUILD_TESTING)

@@ -11,6 +11,8 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>python3-serial</depend>
+  <depend>python3-pygame</depend>
+  <depend>python3-websockets</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
