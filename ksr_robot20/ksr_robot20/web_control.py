@@ -7,6 +7,7 @@ import ksr_robot20.webserver.ws_server
 import numpy as np
 import numpy.linalg as npla
 import math
+from ament_index_python.packages import get_package_share_directory
 
 
 
@@ -14,7 +15,7 @@ class WebControl(rclpy.node.Node):
     def __init__(self):
         super().__init__('teleop')
         self.cmdPub = self.create_publisher(ksr_msg.msg.MotorVel, 'vel_cmd', 10)
-        self.httpServer = ksr_robot20.webserver.httpserver.HttpServer(os.path.join('install', 'ksr_robot20', 'static'))
+        self.httpServer = ksr_robot20.webserver.httpserver.HttpServer(os.path.join(get_package_share_directory('ksr_robot20'), 'static'))
         self.wsServer = ksr_robot20.webserver.ws_server.WsServer(self.recvCallback)
         self.motorVelPub = self.create_publisher(ksr_msg.msg.MotorVel, 'vel_cmd', 10)
         #For converting angle and power to tank controls

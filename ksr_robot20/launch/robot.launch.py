@@ -13,4 +13,8 @@ def generate_launch_description():
             package='ksr_robot20', executable='driver',
             name=[launch.substitutions.LaunchConfiguration('node_prefix'), 'driver']
         ),
+        launch_ros.actions.Node(
+            package='ksr_robot20', executable='web_control',
+            name=[launch.substitutions.LaunchConfiguration('node_prefix'), 'web_control']
+        ),
     ])

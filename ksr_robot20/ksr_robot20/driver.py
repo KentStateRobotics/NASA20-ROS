@@ -18,7 +18,7 @@ class DriverNode(rclpy.node.Node):
     '''
     def __init__(self):
         super().__init__('driver')
-        self.velSub = self.create_subscription(ksr_msg.msg.MotorVel, 'vel_cmd', onVelCmd, 10)
+        self.velSub = self.create_subscription(ksr_msg.msg.MotorVel, 'vel_cmd', self.onVelCmd, 10)
         self.velPub = self.create_publisher(ksr_msg.msg.MotorVel, 'vel', 10)
         self.cmdStruct = struct.Struct("cbbbb")
         self.feedbackStruct = struct.Struct("HHHHH")
@@ -33,11 +33,12 @@ class DriverNode(rclpy.node.Node):
         self.feedbackThread = threading.Thread(target=self.recvFeedback, daemon=True)
         self.feedbackThread.start()
 
-    def connect():
+    def connect(self):
         for p in serial.tools.list_ports.comports():
             if "Arduino" in p[1]:
                 try:
                     self.serialConn = serial.Serial(port = p[0], baudrate = 115200)
+                    self.get_logger().info('Opened serial port')
                 except SerialException as e:
                     self.get_logger().warn('Failed to connect to serial device')
 
@@ -52,7 +53,7 @@ class DriverNode(rclpy.node.Node):
     def recvFeedback(self):
         while(True):
             try:
-                if(self.serialConn.read() == START_CHAR.to_bytes()):
+                if(self.serialConn and self.serialConn.read() == START_CHAR.to_bytes()):
                     data = self.serialConn.read(10)
                     data = self.feedbackStruct.unpack(data)
 
@@ -73,7 +74,10 @@ class DriverNode(rclpy.node.Node):
 def main(args=None):
     rclpy.init(args=args)
     driver = DriverNode()
-    rclpy.spin(driver)
+    try:
+        rclpy.spin(driver)
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == '__main__':
     main(sys.argv)
